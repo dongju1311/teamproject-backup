@@ -138,7 +138,6 @@ export const axiosGet = async (url) => {
 
 
 /**
-<<<<<<< HEAD
  * axiosPost 함수를 이용한 백엔드 연동 처리
  */
 
@@ -178,7 +177,44 @@ export const axiosPost = async (url, data) => {
     }
 }
 
+export const axiosDataPost = async (url, data, customHeaders={}) => {
+    try {
+        const reqUrl = `http://localhost:9000${url}`;
+
+        const headers = {
+            "Content-Type": "application/json",
+            ...customHeaders
+        };
+
+        if (typeof document !== "undefined") {
+            const csrfToken = getCsrfTokenFromCookie();
+            if(csrfToken) headers['X-XSRF-TOKEN'] = csrfToken;
+        }
+        else if (customHeaders.Cookie) {
+            const cookies = customHeaders.Cookie.split(';');
+            const xsrfCookie = cookies.find(c => c.trim().startsWith('XSRF-TOKEN='));
+
+            if (xsrfCookie) {
+                const tokenValue = xsrfCookie.split('=')[1];
+                headers['X-XSRF-TOKEN'] = tokenValue;
+            }
+        }
+
+        console.log("reqURL :: ", reqUrl);
+
+        const response = await axios.post(reqUrl, data, { headers }); // api.post 대신 axios.post 권장 (서버사이드 이슈 방지)
+        return response.data;
+
+    } catch(error) {
+        console.log("🎯 에러발생:", error.response ? error.response.status : error);
+        throw error;
+    }
+}
+
 const getCsrfTokenFromCookie = () => {
+    if (typeof document === 'undefined') {
+        return "";
+    }
     const name = "XSRF-TOKEN=";
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(';');

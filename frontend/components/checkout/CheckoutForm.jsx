@@ -4,13 +4,7 @@ import '@/styles/cart/cartshipping.css'
 import useCartStore from "@/store/useCartStore";
 
 export function CheckoutForm({cartList}) {
-    const {orderInfo, receiverInfo, toggleSameOrderer, userOrderInfo} = useCartStore();
-    useEffect(() => {
-        if (cartList && cartList.length > 0) {
-            userOrderInfo(cartList[0]);
-            toggleSameOrderer(true);
-        }
-    }, [cartList, toggleSameOrderer, userOrderInfo]);
+    const {orderInfo, receiverInfo} = useCartStore();
 
 
     return (

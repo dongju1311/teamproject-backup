@@ -16,11 +16,15 @@ const ProtectedRoute = ({children}) => {
                 title: "로그인 필요",
                 text: "로그인이 필요합니다.",
             });
-            return router.replace("/login");
+            router.replace("/login");
         }
-        return children;
-    }, [children, isLogin, router]);
-    
+    }, [isLogin, router]);
+
+    if (!isLogin) {
+        return null;
+    }
+
+    return children;
 }
 
 export default ProtectedRoute;

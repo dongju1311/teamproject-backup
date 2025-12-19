@@ -16,7 +16,7 @@ export default async function ProductsPage({params}) {
     return (
         <div className='content' style={{paddingTop:'35px'}}>
             <div style={{marginTop:'20px'}}>
-                <h2 className='all-products-title'>{category || 'All Products'}</h2>
+                <h2 className='all-products-title' style={{textAlign:'center', textTransform: 'uppercase'}}>{category || 'All Products'}</h2>
             </div>
             <ProductList products={product}/>
         </div>

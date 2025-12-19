@@ -27,7 +27,7 @@ export function ProductDetail({product}) {
             router.push("/login");
             return;
         }
-        addCart(product.product_id, category);
+        addCart(product.product_id, product.category);
     }
 
     const goToPurchase = () => {

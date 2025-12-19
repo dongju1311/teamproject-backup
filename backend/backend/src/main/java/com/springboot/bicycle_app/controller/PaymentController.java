@@ -1,12 +1,14 @@
 package com.springboot.bicycle_app.controller;
 
+import com.springboot.bicycle_app.dto.purchase.CartItemRequestDto;
 import com.springboot.bicycle_app.dto.purchase.OrderRequestDto;
 import com.springboot.bicycle_app.dto.purchase.OrderResponseDto;
 import com.springboot.bicycle_app.dto.purchase.TossPayDto;
 import com.springboot.bicycle_app.service.purchase.OrderService;
-import com.springboot.bicycle_app.service.purchase.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +22,13 @@ public class PaymentController {
     @Autowired
     public PaymentController(OrderService orderService){
         this.orderService = orderService;
+    }
+
+    private void setUidFromSession(OrderRequestDto dto, UserDetails user) {
+        if (user == null) {
+            throw new RuntimeException("로그인이 필요한 서비스입니다.");
+        }
+        dto.setUserId(user.getUsername());
     }
 
     @PostMapping("/request")
@@ -53,7 +62,18 @@ public class PaymentController {
         }
     }
     @PostMapping("/order")
-    public List<OrderResponseDto> findList(@RequestBody OrderRequestDto dto){
+    public List<OrderResponseDto> findList(
+            @RequestBody(required = false) OrderRequestDto dto,
+            @AuthenticationPrincipal UserDetails user) {
+        if (user == null) {
+            return List.of();
+        }
+
+        if (dto == null) {
+            dto = new OrderRequestDto();
+        }
+        dto.setUserId(user.getUsername());
+
         return orderService.findList(dto);
-    }
+        }
 }

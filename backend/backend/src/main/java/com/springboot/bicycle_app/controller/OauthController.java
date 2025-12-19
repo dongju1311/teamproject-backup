@@ -88,7 +88,7 @@ public class OauthController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 14)
-                .sameSite("Strict") //📌 SameSite=Strict 는 cross-site 요청에서 쿠키 전송 ❌, None or Lax 변경
+                .sameSite("None") //📌 SameSite=Strict 는 cross-site 요청에서 쿠키 전송 ❌, None or Lax 변경
                 //.secure(false)  //📌로컬 개발이라 http, https 아님, 배포 시 true
                 .build();
 
@@ -232,6 +232,7 @@ public class OauthController {
 
             // SecurityContext 세션에 "명시 저장" (requireExplicitSave(true)일 때 필수)
             contextRepository.saveContext(context, request, response);
+
 
             //4. 로그인 성공 시 CSRF 토큰을 재발행을 위해 브라우저 토큰 null 처리
             var xsrf = new Cookie("XSRF-TOKEN", null);

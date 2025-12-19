@@ -40,6 +40,7 @@ public class CartServiceImpl implements CartService{
         List<CartListResponseDto> list = new ArrayList<>();
         List<CartItem> cartItemList = jpaCartRepository.findList(requestDto.getUid());
         long totalPrice = cartItemList.stream()
+                .filter(item -> item.isChecked())
                 .mapToLong(item -> item.getQty() * item.getProduct().getPrice())
                 .sum();
         cartItemList.forEach(cartItem -> {

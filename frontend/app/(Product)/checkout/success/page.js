@@ -1,7 +1,7 @@
 "use client"
 import {useEffect, useState} from "react";
 import {confirmPayment} from "@/utils/payment/PaymentAPI.js";
-import '@/styles/successpage.css';
+import '@/styles/product/successpage.css';
 import {useRouter, useSearchParams} from "next/navigation";
 
 
@@ -12,6 +12,7 @@ export default function SuccessPage() {
     const [orderName, setOrderName] = useState("");
 
     useEffect(() => {
+
         const orderId =  searchParams.get("orderId");
         const amount = searchParams.get("amount");
         const paymentKey =  searchParams.get("paymentKey");
@@ -31,7 +32,7 @@ export default function SuccessPage() {
             }
         }
         handleConfirm();
-    }, [router, searchParams]);
+    }, []);
 
     if (!isConfirm) {
         return (

@@ -94,7 +94,7 @@ const useCartStore = create(
             }
         }),
         checkItem: async(cid) => {
-            const url = "http://localhost:9000/cart/toggleCheck";
+            const url = "/cart/toggleCheck";
             const data = {"cid": cid};
             await axiosPost(url, data);
             const{checkCartItem,updateTotalPrice} = get();
@@ -102,9 +102,9 @@ const useCartStore = create(
             updateTotalPrice();
         },
         addCart: async(pid) => {
-            // const {userId} = JSON.parse(localStorage.getItem("loginInfo"));
-            const  userId  = "test111";
-            const url = "http://localhost:9000/cart/add";
+            const {userId} = JSON.parse(localStorage.getItem("loginInfo"));
+            // const  userId  = "test111";
+            const url = "/cart/add";
             const data = {"product_id": Number(pid), "qty": 1, "checked": true, "uid": userId};
 
             const response = await axiosPost(url, data);
@@ -123,7 +123,7 @@ const useCartStore = create(
             }
         },
         updateCart: async(cid,type) => {
-            const url = "http://localhost:9000/cart/updateCart";
+            const url = "/cart/updateCart";
             const data = {"cid":cid,"type":type};
             const rows = await axiosPost(url,data);
             const {updateCartItem, updateTotalPrice} = get();
@@ -131,7 +131,7 @@ const useCartStore = create(
             updateTotalPrice();
         },
         removeCart: async (cid) => {
-            const url = "http://localhost:9000/cart/delete";
+            const url = "/cart/delete";
             const data = {"cid":cid};
             const rows = await axiosPost(url,data);
             const { removeCartItem, updateTotalPrice } = get();

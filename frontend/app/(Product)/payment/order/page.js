@@ -1,10 +1,12 @@
 import {OrderListMain} from "@/components/checkout/OrderListMain";
-import {axiosPost} from "@/utils/dataFetch";
+import {axiosDataPost, axiosPost} from "@/utils/dataFetch";
+import {cookies} from "next/headers";
 
 const getOrderList = async () => {
-    const url = 'http://localhost:9000/payment/order';
-    const { userId } = JSON.parse(localStorage.getItem("loginInfo"));
-    const data = await axiosPost(url,{"uid":userId});
+    const url = '/payment/order';
+    const cookieStore = await cookies();
+    const allCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+    const data = await axiosDataPost(url, {}, { "Cookie": allCookies });
     return data;
 }
 
