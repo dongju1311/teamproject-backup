@@ -60,6 +60,8 @@ public class WebConfig implements WebMvcConfigurer {
             // 2. SameSite 설정을 'Lax'로 강제 고정합니다.
             processor.setSameSiteCookies(SameSiteCookies.LAX.getValue());
 
+            // ❌ [삭제] processor.setSecure(false); -> 이 줄이 에러 원인이므로 지웁니다!
+
             // 3. 설정을 적용합니다.
             context.setCookieProcessor(processor);
         });

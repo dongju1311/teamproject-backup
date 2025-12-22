@@ -1,5 +1,5 @@
 "use client"
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {confirmPayment} from "@/utils/payment/PaymentAPI.js";
 import '@/styles/product/successpage.css';
 import {useRouter, useSearchParams} from "next/navigation";
@@ -10,6 +10,7 @@ export default function SuccessPage() {
     const searchParams= useSearchParams();
     const [isConfirm, setIsConfirm] = useState(false);
     const [orderName, setOrderName] = useState("");
+    const isCalled = useRef(false);
 
     useEffect(() => {
 
@@ -21,6 +22,8 @@ export default function SuccessPage() {
             return;
         }
         const handleConfirm = async () => {
+            if (isCalled.current) return;
+            isCalled.current = true;
             try {
                 const response = await confirmPayment(paymentKey,orderId,amount);
                 if (response && response.orderName) {
@@ -43,6 +46,10 @@ export default function SuccessPage() {
                 </div>
             </div>
         );
+    }
+
+    const goToProduct = () => {
+        router.push("/");
     }
 
     return (
@@ -72,6 +79,9 @@ export default function SuccessPage() {
                     {/*    <span>paymentKey:</span>*/}
                     {/*    <span className="payment-key">{searchParams.get("paymentKey")}</span>*/}
                     {/*</p>*/}
+                    <div className="cart-empty-message">
+                        <button onClick={goToProduct}>홈으로 가기</button>
+                    </div>
                 </div>
             </div>
         </div>

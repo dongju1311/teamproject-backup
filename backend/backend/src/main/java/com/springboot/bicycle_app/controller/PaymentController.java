@@ -24,16 +24,16 @@ public class PaymentController {
         this.orderService = orderService;
     }
 
-    private void setUidFromSession(OrderRequestDto dto, UserDetails user) {
-        if (user == null) {
-            throw new RuntimeException("로그인이 필요한 서비스입니다.");
-        }
-        dto.setUserId(user.getUsername());
-    }
 
     @PostMapping("/request")
-    public ResponseEntity<?> requestPayment(@RequestBody OrderRequestDto dto) {
+    public ResponseEntity<?> requestPayment(@RequestBody OrderRequestDto dto,
+                                            @AuthenticationPrincipal UserDetails user) {
         try {
+            if (user == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            dto.setUserId(user.getUsername());
             var order = orderService.createOrder(dto);
             return ResponseEntity.ok(Map.of(
                     "message", "주문 생성 완료",

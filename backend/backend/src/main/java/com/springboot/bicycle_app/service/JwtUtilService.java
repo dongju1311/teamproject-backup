@@ -1,5 +1,6 @@
 package com.springboot.bicycle_app.service;
 
+import com.springboot.bicycle_app.dto.UserInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,16 +30,16 @@ public class JwtUtilService {
         return Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKey));
     }
 //
-//    //accessToken 생성
-//    public String createAccessToken(MemberDto member) {
-//        return Jwts.builder()
-//                .setSubject(member.getId())
-//                .claim("role", member.getRole())
-//                .setIssuedAt(new Date())
-//                .setExpiration(new Date(System.currentTimeMillis() + accessExpireMs))
-//                .signWith(signingKey(), SignatureAlgorithm.HS256)
-//                .compact();
-//    }
+    //accessToken 생성
+    public String createAccessToken(UserInfoDto member) {
+        return Jwts.builder()
+                .setSubject(member.getUid())
+                .claim("role", member.getRole())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + accessExpireMs))
+                .signWith(signingKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
 //
 //    //refreshToken 생성
 //    public String createRefreshToken(MemberDto member) {

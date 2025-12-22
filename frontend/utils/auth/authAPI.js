@@ -32,6 +32,10 @@ export const getLogin = async(formData, param) => {
             const url = "/auth/login";
             const result = await axiosPost(url, formData);
             await refreshCsrfToken();
+            if(result && result.login) {
+                localStorage.setItem("loginInfo", JSON.stringify(result));
+                console.log("일반 로그인 정보 저장 완료 (토큰 포함)");
+            }
             console.log(result);
             return result;
         }

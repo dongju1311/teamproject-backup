@@ -9,8 +9,12 @@ import {cookies} from "next/headers";
 
 const getCheckoutList = async () => {
     const url = '/cart/list';
+
+    // 1. 쿠키 가져오기
     const cookieStore = await cookies();
     const allCookies = cookieStore.getAll().map(c => `${c.name}=${c.value}`).join('; ');
+
+    // 2. 헤더에 쿠키 실어 보내기 (이게 없으면 백엔드는 로그인 안 한 걸로 취급함)
     const data = await axiosDataPost(url, {}, { "Cookie": allCookies });
     return data;
 }

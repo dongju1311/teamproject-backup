@@ -35,13 +35,15 @@ public class OauthController {
     private final OauthJWTService oauthJWTService;
     private final TravelService travelService;
     private final MailSenderRunner mailSenderRunner;
+    private final JwtUtilService jwtUtilService;
 
     public OauthController(OauthService oauthService,
                            AuthenticationManager authenticationManager,
                            HttpSessionSecurityContextRepository contextRepository,
                            OauthJWTService oauthJWTService,
                            TravelService travelService,
-                           MailSenderRunner mailSenderRunner)
+                           MailSenderRunner mailSenderRunner,
+                            JwtUtilService jwtUtilService)
     {
         this.oauthService = oauthService;
         this.authenticationManager = authenticationManager;
@@ -49,6 +51,7 @@ public class OauthController {
         this.oauthJWTService = oauthJWTService;
         this.travelService = travelService;
         this.mailSenderRunner=mailSenderRunner;
+        this.jwtUtilService=jwtUtilService;
     }
 
     @PostMapping("/token")
@@ -329,12 +332,38 @@ public class OauthController {
         var principal = (org.springframework.security.core.userdetails.User)
                 authentication.getPrincipal();
 
+        String uid = principal.getUsername();
+        String role = principal.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("ROLE_USER");
+        UserInfoDto dto = new UserInfoDto(uid,role);
+        String newAccessToken = jwtUtilService.createAccessToken(dto);
+
         return ResponseEntity.ok(Map.of(
-                "isLogin", Boolean.TRUE,
-                "uid", principal.getUsername(),
-                "role", principal.getAuthorities()
+                "authenticated", true,
+                "userId", uid,
+                "role", principal.getAuthorities(),
+                "accessToken", newAccessToken
         ));
     }
+
+//    @GetMapping("/me")
+//    public ResponseEntity<?> me(Authentication authentication) {
+//
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            return ResponseEntity.ok(Map.of("isLogin", false));
+//        }
+//
+//        var principal = (org.springframework.security.core.userdetails.User)
+//                authentication.getPrincipal();
+//
+//        return ResponseEntity.ok(Map.of(
+//                "isLogin", Boolean.TRUE,
+//                "uid", principal.getUsername(),
+//                "role", principal.getAuthorities()
+//        ));
+//    }
 
     @PostMapping("/updateUser")
     @Transactional
