@@ -1,12 +1,14 @@
 package com.springboot.bicycle_app.controller;
 
+import com.springboot.bicycle_app.dto.purchase.CartItemRequestDto;
 import com.springboot.bicycle_app.dto.purchase.OrderRequestDto;
 import com.springboot.bicycle_app.dto.purchase.OrderResponseDto;
 import com.springboot.bicycle_app.dto.purchase.TossPayDto;
 import com.springboot.bicycle_app.service.purchase.OrderService;
-import com.springboot.bicycle_app.service.purchase.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +24,16 @@ public class PaymentController {
         this.orderService = orderService;
     }
 
+
     @PostMapping("/request")
-    public ResponseEntity<?> requestPayment(@RequestBody OrderRequestDto dto) {
+    public ResponseEntity<?> requestPayment(@RequestBody OrderRequestDto dto,
+                                            @AuthenticationPrincipal UserDetails user) {
         try {
+            if (user == null) {
+                return ResponseEntity.status(401).body(Map.of("message", "로그인이 필요합니다."));
+            }
+
+            dto.setUserId(user.getUsername());
             var order = orderService.createOrder(dto);
             return ResponseEntity.ok(Map.of(
                     "message", "주문 생성 완료",
@@ -53,7 +62,18 @@ public class PaymentController {
         }
     }
     @PostMapping("/order")
-    public List<OrderResponseDto> findList(@RequestBody OrderRequestDto dto){
+    public List<OrderResponseDto> findList(
+            @RequestBody(required = false) OrderRequestDto dto,
+            @AuthenticationPrincipal UserDetails user) {
+        if (user == null) {
+            return List.of();
+        }
+
+        if (dto == null) {
+            dto = new OrderRequestDto();
+        }
+        dto.setUserId(user.getUsername());
+
         return orderService.findList(dto);
-    }
+        }
 }

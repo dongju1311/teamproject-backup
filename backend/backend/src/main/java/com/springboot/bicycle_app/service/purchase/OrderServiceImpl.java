@@ -61,6 +61,13 @@ public class OrderServiceImpl implements OrderService {
     public Object confirmPayment(TossPayDto dto) {
         Order order = jpaOrderServiceRepository.findByOrderId(dto.getOrderId())
                 .orElseThrow(() -> new PaymentFailedException("주문 정보를 찾을 수 없습니다."));
+        if ("DONE".equals(order.getStatus())) {
+            return Map.of(
+                    "orderId", order.getOrderId(),
+                    "orderName", order.getOrderName(),
+                    "status", "DONE"
+            );
+        }
         if (dto.getAmount() != order.getTotalPrice()) {
             throw new PaymentFailedException("결제 금액이 주문 금액과 일치하지 않습니다.");
         }

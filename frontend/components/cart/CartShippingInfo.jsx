@@ -69,7 +69,6 @@ export default function CartShippingInfo() {
             });
             return;
         }
-
         router.push("/checkout");
     }
         return (

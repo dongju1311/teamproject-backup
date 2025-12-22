@@ -35,13 +35,15 @@ public class OauthController {
     private final OauthJWTService oauthJWTService;
     private final TravelService travelService;
     private final MailSenderRunner mailSenderRunner;
+    private final JwtUtilService jwtUtilService;
 
     public OauthController(OauthService oauthService,
                            AuthenticationManager authenticationManager,
                            HttpSessionSecurityContextRepository contextRepository,
                            OauthJWTService oauthJWTService,
                            TravelService travelService,
-                           MailSenderRunner mailSenderRunner)
+                           MailSenderRunner mailSenderRunner,
+                            JwtUtilService jwtUtilService)
     {
         this.oauthService = oauthService;
         this.authenticationManager = authenticationManager;
@@ -49,6 +51,7 @@ public class OauthController {
         this.oauthJWTService = oauthJWTService;
         this.travelService = travelService;
         this.mailSenderRunner=mailSenderRunner;
+        this.jwtUtilService=jwtUtilService;
     }
 
     @PostMapping("/token")
@@ -88,7 +91,7 @@ public class OauthController {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(60 * 60 * 24 * 14)
-                .sameSite("Strict") //📌 SameSite=Strict 는 cross-site 요청에서 쿠키 전송 ❌, None or Lax 변경
+                .sameSite("None") //📌 SameSite=Strict 는 cross-site 요청에서 쿠키 전송 ❌, None or Lax 변경
                 //.secure(false)  //📌로컬 개발이라 http, https 아님, 배포 시 true
                 .build();
 
@@ -233,6 +236,7 @@ public class OauthController {
             // SecurityContext 세션에 "명시 저장" (requireExplicitSave(true)일 때 필수)
             contextRepository.saveContext(context, request, response);
 
+
             //4. 로그인 성공 시 CSRF 토큰을 재발행을 위해 브라우저 토큰 null 처리
             var xsrf = new Cookie("XSRF-TOKEN", null);
             xsrf.setPath("/");               // ← 기존과 동일
@@ -328,12 +332,38 @@ public class OauthController {
         var principal = (org.springframework.security.core.userdetails.User)
                 authentication.getPrincipal();
 
+        String uid = principal.getUsername();
+        String role = principal.getAuthorities().stream()
+                .map(org.springframework.security.core.GrantedAuthority::getAuthority)
+                .findFirst()
+                .orElse("ROLE_USER");
+        UserInfoDto dto = new UserInfoDto(uid,role);
+        String newAccessToken = jwtUtilService.createAccessToken(dto);
+
         return ResponseEntity.ok(Map.of(
-                "isLogin", Boolean.TRUE,
-                "uid", principal.getUsername(),
-                "role", principal.getAuthorities()
+                "authenticated", true,
+                "userId", uid,
+                "role", principal.getAuthorities(),
+                "accessToken", newAccessToken
         ));
     }
+
+//    @GetMapping("/me")
+//    public ResponseEntity<?> me(Authentication authentication) {
+//
+//        if (authentication == null || !authentication.isAuthenticated()) {
+//            return ResponseEntity.ok(Map.of("isLogin", false));
+//        }
+//
+//        var principal = (org.springframework.security.core.userdetails.User)
+//                authentication.getPrincipal();
+//
+//        return ResponseEntity.ok(Map.of(
+//                "isLogin", Boolean.TRUE,
+//                "uid", principal.getUsername(),
+//                "role", principal.getAuthorities()
+//        ));
+//    }
 
     @PostMapping("/updateUser")
     @Transactional

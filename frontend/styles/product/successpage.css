@@ -119,3 +119,29 @@
     font-size: 1.1rem;
     color: var(--color-blue, #0077cc); /* commons.css 변수 사용 */
 }
+.cart-empty-message button {
+    /* '주문하기' 버튼과 동일한 스타일 적용 */
+    background-color: #d9534f; /* 붉은색 */
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cart-empty-message button:hover {
+    background-color: #c9302c;
+}
+
+.cart-empty-message {
+    /* .cart-total-summary와 동일한 테두리/여백 적용 */
+    border-top: 1px solid #ccc;
+    margin-top: -1px;
+    padding: 1rem 1rem; /* 위아래로 넉넉한 여백 */
+
+    /* 내부 요소(p, button)들을 중앙 정렬 */
+    text-align: center;
+}

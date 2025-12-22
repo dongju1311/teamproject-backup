@@ -8,13 +8,9 @@ import useCartStore from "@/store/useCartStore";
 const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 
 export function CheckoutPayment({ totalPrice, cartList }) {
-    const { receiverInfo, showCart } = useCartStore();
+    const { receiverInfo} = useCartStore();
     const widgetRef = useRef(null);
-    useEffect(() => {
-        if (!cartList || cartList.length === 0) {
-            showCart();
-        }
-    }, [cartList, showCart]);
+
     useEffect(() => {
         let isCancelled = false;
 

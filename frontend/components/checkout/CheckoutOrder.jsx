@@ -1,6 +1,6 @@
-export function CheckoutOrder({ cartList, totalPrice }) {
+export function CheckoutOrder({ cartList=[], totalPrice }) {
     // const checkedItems = cartList.filter(item => item.checked && item.price);
-    const checkedItems = cartList.filter(item => item.price > 0);
+    const checkedItems = cartList.filter(item => Boolean(item.checked));
     return (
         <div className="order-summary-container">
             <h3>주문제품 내역</h3>
@@ -29,7 +29,7 @@ export function CheckoutOrder({ cartList, totalPrice }) {
             <div className="order-total-bottom">
                 <div className="total-item">
                     <span className="label">총 판매금액</span>
-                    <span className="value">{totalPrice.toLocaleString()}원</span>
+                    <span className="value">{cartList.totalPrice}원</span>
                 </div>
                 <span className="operator">-</span>
                 <div className="total-item">

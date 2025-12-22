@@ -1,5 +1,10 @@
 package com.springboot.bicycle_app.config;
 
+
+import org.apache.tomcat.util.http.Rfc6265CookieProcessor;
+import org.apache.tomcat.util.http.SameSiteCookies;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -45,5 +50,20 @@ public class WebConfig implements WebMvcConfigurer {
                         .allowCredentials(true);
             }
         };
+    }
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
+        return factory -> factory.addContextCustomizers(context -> {
+            // 1. Tomcat의 쿠키 처리기를 가져옵니다.
+            Rfc6265CookieProcessor processor = new Rfc6265CookieProcessor();
+
+            // 2. SameSite 설정을 'Lax'로 강제 고정합니다.
+            processor.setSameSiteCookies(SameSiteCookies.LAX.getValue());
+
+            // ❌ [삭제] processor.setSecure(false); -> 이 줄이 에러 원인이므로 지웁니다!
+
+            // 3. 설정을 적용합니다.
+            context.setCookieProcessor(processor);
+        });
     }
 }

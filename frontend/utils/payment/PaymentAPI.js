@@ -22,7 +22,7 @@ export const requestTossPay = async (widgets, cartList, totalPrice,receiverInfo)
         const { userId } = JSON.parse(localStorage.getItem("loginInfo") || "{}");
 
         const orderData = {
-            userId: userId,
+            // userId: userId,
             amount: totalPrice,
             orderName: formattedOrderName,
             uaddress: receiverInfo.address,
@@ -58,12 +58,12 @@ export const confirmPayment = async (paymentKey,orderId,amount,cartList) => {
             : firstItemName;
     }
     const url = "/payment/confirm";
-    const { userId } = JSON.parse(localStorage.getItem("loginInfo"));
+    // const { userId } = JSON.parse(localStorage.getItem("loginInfo"));
     const data = {
         paymentKey: paymentKey,
         orderId: orderId,
         amount: Number(amount),
-        userId: userId,
+        // userId: userId,
         orderName: formattedOrderName
 
     };

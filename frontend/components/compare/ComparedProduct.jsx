@@ -31,7 +31,7 @@ export function ComparedProduct(){
                                 <p className="product-name">{product.name}</p>
                                 <button
                                     className="remove-btn"
-                                    onClick={() => removeCompareItem(product)}>
+                                    onClick={() => removeCompareItem(product.pid, product.category)}>
                                     삭제
                                 </button>
                             </th>

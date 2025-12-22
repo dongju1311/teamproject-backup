@@ -5,21 +5,39 @@ import {CartHeader} from "@/components/cart/CartHeader";
 import {CartItem} from "@/components/cart/CartItem";
 import {useEffect} from "react";
 import useCartStore from "@/store/useCartStore";
+import {axiosPost} from "@/utils/dataFetch";
 
-export default function CartMain({initialCartList}){
+export default function CartMain() {
     const {showCartItem, updateTotalPrice} = useCartStore();
 
     useEffect(() => {
-        if (initialCartList && initialCartList.length > 0) {
-            showCartItem(initialCartList );
-            updateTotalPrice();
-        }
-    }, [initialCartList, showCartItem, updateTotalPrice]);
+
+        const getCartList = async () => {
+            const storedInfo = localStorage.getItem("loginInfo");
+            if (!storedInfo) return;
+
+            const { userId } = JSON.parse(storedInfo);
+
+            try {
+                const url = `/cart/list`;
+                const data = await axiosPost(url, { "uid": userId });
+
+                if (data) {
+                    showCartItem(data);
+                    updateTotalPrice();
+                }
+            } catch (error) {
+            }
+        };
+
+        getCartList();
+    }, [showCartItem, updateTotalPrice]);
+
     return(
         <>
-        <CartHeader />
-        <CartItem />
-        <CartShippingInfo />
+            <CartHeader />
+            <CartItem />
+            <CartShippingInfo />
         </>
     );
 }

@@ -15,6 +15,42 @@ const api = axios.create({
  * 브라우저(클라이언트)에서 '요청주소(ex. /product/all)'로 실제 요청을 보내기 직전에 실행된다.
  * 브라우저 → axios 요청 발생 → Request Interceptor 실행 → 서버(Spring Boot)로 전송
  */
+/**
+ * [수정됨] 요청(Request) 인터셉터
+ * 기능 1: API 요청 전 헤더에 토큰(AccessToken) 자동 주입
+ * 기능 2: (NEW!) 새로고침 시 Zustand 초기화로 토큰이 날아갔을 경우, LocalStorage에서 자동 복구
+ */
+// api.interceptors.request.use(
+//     (config) => {
+//         let token = useAuthStore.getState().accessToken;
+//
+//         if (!token) {
+//             const storageData = localStorage.getItem("loginInfo");
+//             if (storageData) {
+//                 try {
+//                     const parsedData = JSON.parse(storageData);
+//                     // 💡 여기서 키 이름을 result 객체와 똑같이 맞춰야 합니다!
+//                     // 만약 백엔드에서 준 키가 'token'이면 parsedData.token으로 써야 합니다.
+//                     token = parsedData?.accessToken || parsedData?.token;
+//
+//                     if (token) {
+//                         useAuthStore.getState().setAccessToken(token);
+//                     }
+//                 } catch (e) {
+//                     console.error("복구 에러:", e);
+//                 }
+//             }
+//         }
+//
+//         if (token && !config.url.includes("/auth/refresh")) {
+//             config.headers.Authorization = `Bearer ${token}`;
+//         }
+//
+//         // 🔥 [매우 중요] 이 줄이 없으면 요청이 멈춥니다.
+//         return config;
+//     },
+//     (error) => Promise.reject(error)
+// );
 api.interceptors.request.use(
     (config) => {
         const token = useAuthStore.getState().accessToken;
@@ -133,12 +169,12 @@ export const axiosGet = async (url) => {
         return response?.data;
     }catch(error) {
         console.log("🎯 에러발생, 페이지 이동합니다!!");
+
     }
 }
 
 
 /**
-<<<<<<< HEAD
  * axiosPost 함수를 이용한 백엔드 연동 처리
  */
 
@@ -178,7 +214,44 @@ export const axiosPost = async (url, data) => {
     }
 }
 
+export const axiosDataPost = async (url, data, customHeaders={}) => {
+    try {
+        const reqUrl = `http://localhost:9000${url}`;
+
+        const headers = {
+            "Content-Type": "application/json",
+            ...customHeaders
+        };
+
+        if (typeof document !== "undefined") {
+            const csrfToken = getCsrfTokenFromCookie();
+            if(csrfToken) headers['X-XSRF-TOKEN'] = csrfToken;
+        }
+        else if (customHeaders.Cookie) {
+            const cookies = customHeaders.Cookie.split(';');
+            const xsrfCookie = cookies.find(c => c.trim().startsWith('XSRF-TOKEN='));
+
+            if (xsrfCookie) {
+                const tokenValue = xsrfCookie.split('=')[1];
+                headers['X-XSRF-TOKEN'] = tokenValue;
+            }
+        }
+
+        console.log("reqURL :: ", reqUrl);
+
+        const response = await api.post(reqUrl, data, { headers }); // api.post 대신 axios.post 권장 (서버사이드 이슈 방지)
+        return response.data;
+
+    } catch(error) {
+        console.log("🎯 에러발생:", error.response ? error.response.status : error);
+        throw error;
+    }
+}
+
 const getCsrfTokenFromCookie = () => {
+    if (typeof document === 'undefined') {
+        return "";
+    }
     const name = "XSRF-TOKEN=";
     const decodedCookie = decodeURIComponent(document.cookie);
     const ca = decodedCookie.split(';');

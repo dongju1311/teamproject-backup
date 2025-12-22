@@ -27,6 +27,7 @@ public class CartListResponseDto {
     private String color;
     private int qty;
     private long totalPrice;
+    private boolean checked;
 
     private CartListResponseDto(){}
     public CartListResponseDto(CartItem entity, long totalPrice){
@@ -47,5 +48,6 @@ public class CartListResponseDto {
         this.color = entity.getProduct().getColor();
         this.qty = entity.getQty();
         this.totalPrice = totalPrice;
+        this.checked = entity.isChecked();
     }
 }
