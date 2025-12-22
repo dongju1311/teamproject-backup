@@ -56,6 +56,4 @@
 ![Slide56](./readmeImage/Slide56.jpg)
 ![Slide57](./readmeImage/Slide57.jpg)
 ![Slide58](./readmeImage/Slide58.jpg)
-![Slide59](./readmeImage/Slide59.jpg)
-![Slide60](./readmeImage/Slide60.jpg)
 ![Slide61](./readmeImage/Slide61.jpg)
